@@ -89,7 +89,7 @@ optimizer = optim.SGD(net.parameters(), lr=args.lr,
 
 
 # Training
-def train(epoch):
+def train(epoch, optimizer):
     print('\nEpoch: %d' % epoch)
     net.train()
     train_loss = 0
@@ -101,7 +101,7 @@ def train(epoch):
     elif epoch==250:
         optimizer = optim.SGD(net.parameters(), lr=args.lr*0.01, momentum=0.9, weight_decay=5e-4)
         print('lr schedule 0.001')
-        
+
     for batch_idx, (inputs, targets) in enumerate(trainloader):
         inputs, targets = inputs.to(device), targets.to(device)
         optimizer.zero_grad()
@@ -159,5 +159,5 @@ def test(epoch):
 
 
 for epoch in range(start_epoch, start_epoch+200):
-    train(epoch)
+    train(epoch, optimizer)
     test(epoch)
