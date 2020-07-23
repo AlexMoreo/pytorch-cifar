@@ -55,7 +55,7 @@ classes = ('plane', 'car', 'bird', 'cat', 'deer',
 # Model
 print('==> Building model..')
 # net = VGG('VGG19')
-# net = ResNet18()
+net = ResNet18()
 # net = PreActResNet18()
 # net = GoogLeNet()
 # net = DenseNet121()
@@ -67,7 +67,8 @@ print('==> Building model..')
 # net = SENet18()
 # net = ShuffleNetV2(1)
 # net = EfficientNetB0()
-net = RegNetX_200MF()
+#net = RegNetX_200MF()
+print(net.__class__.__name__)
 net = net.to(device)
 if device == 'cuda':
     net = torch.nn.DataParallel(net)
@@ -94,10 +95,21 @@ def train(epoch):
     train_loss = 0
     correct = 0
     total = 0
+    if epoch==150:
+        optimizer = optim.SGD(net.parameters(), lr=args.lr*0.1, momentum=0.9, weight_decay=5e-4)
+        print('lr schedule 0.01')
+    elif epoch==250:
+        optimizer = optim.SGD(net.parameters(), lr=args.lr*0.01, momentum=0.9, weight_decay=5e-4)
+        print('lr schedule 0.001')
+        
     for batch_idx, (inputs, targets) in enumerate(trainloader):
         inputs, targets = inputs.to(device), targets.to(device)
         optimizer.zero_grad()
-        outputs = net(inputs)
+        outputs, intermediate_outputs = net(inputs)
+        print(outputs.shape)
+        print(len(intermediate_outputs))
+        print([o.shape for o in intermediate_outputs])
+        print()
         loss = criterion(outputs, targets)
         loss.backward()
         optimizer.step()
